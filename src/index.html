@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack — Gestão Financeira</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Estilos -->
+<link rel="stylesheet" href="style.css">
+
+<!-- Dependências externas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="shell">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside id="sidebar">
+  <div class="brand">
+    <div class="brand-logo" onclick="goto('home')" title="Início">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L3.5 5.5V11C3.5 15.1 6.8 18.9 11 20C15.2 18.9 18.5 15.1 18.5 11V5.5L11 2Z" fill="white" fill-opacity="0.15" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M6.5 13.5L9.5 10L12 12L15.5 8.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 8.5H15.5V11" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">FinTrack</span>
+        <span class="logo-sub">Gestão Financeira</span>
+      </div>
+    </div>
+    <button class="sb-toggle" onclick="toggleSlim()" title="Recolher / expandir">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <nav class="nav-scroll">
+    <div class="nav-group">
+      <div class="nav-glab">Principal</div>
+      <a class="nav-item active" data-tip="Home" onclick="goto('home',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5L1.5 7v7.5H6V11h4v3.5h4.5V7L8 1.5z"/></svg>
+        <span class="nav-lbl">Home</span>
+      </a>
+      <a class="nav-item" data-tip="Dashboard" onclick="goto('dashboard',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5.5v5.5H2V2zm0 6.5h5.5V14H2V8.5zm6.5-6.5H14v5.5H8.5V2zm0 6.5H14V14H8.5V8.5z"/></svg>
+        <span class="nav-lbl">Dashboard</span>
+      </a>
+      <a class="nav-item" data-tip="Transações" onclick="goto('transacoes',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1.5H2V4zm0 3.5h12V9H2V7.5zm0 3.5h9v1.5H2V11z"/></svg>
+        <span class="nav-lbl">Transações</span>
+        <span class="nav-ct" id="tx-ct">0</span>
+      </a>
+      <a class="nav-item" data-tip="Projetos" onclick="goto('projetos',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a5 5 0 1 1 0 10A5 5 0 0 1 8 3zm0 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm0 1.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+        <span class="nav-lbl">Projetos</span>
+      </a>
+      <a class="nav-item" data-tip="Calendário" onclick="goto('calendario',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M5 1v2H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-2V1h-1.5v2h-3V1H5zm-2 5h10v7H3V6z"/></svg>
+        <span class="nav-lbl">Calendário</span>
+      </a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-glab" style="margin-top:4px">Análise</div>
+      <a class="nav-item" data-tip="Distribuição" onclick="goto('distribuicao',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm0 1.5a4.5 4.5 0 0 1 4.24 5.97H8V3.5zM3.76 9.47A4.5 4.5 0 0 1 7.5 3.55v5.45L3.76 9.47z"/></svg>
+        <span class="nav-lbl">Distribuição</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sb-foot">
+    <div class="theme-btn" onclick="toggleDark()" title="Tema">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v1.5M8 13.5V15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M1 8h1.5M13.5 8H15M4.11 11.89l-1.06 1.06M12.95 4.11l-1.06-1.06M8 5a3 3 0 1 0 0 6A3 3 0 0 0 8 5z"/></svg>
+      <span class="theme-lbl">Tema</span>
+      <div class="pill"><div class="pill-d"></div></div>
+    </div>
+    <div class="user-btn" id="user-btn" onclick="toggleUDrop(event)" title="Perfil">
+      <div class="ava">BW</div>
+      <div class="uinfo">
+        <div class="uname">Bruce Wayne</div>
+        <div class="uplan">Plano Pro · Ativo</div>
+      </div>
+      <svg class="u-chev" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="udrop" id="udrop">
+      <div class="udrop-head">
+        <div class="udrop-ava">BW</div>
+        <div><div class="udrop-name">Bruce Wayne</div><div class="udrop-email">bruce@wayne.com</div></div>
+      </div>
+      <div class="udrop-sep"></div>
+      <div class="udrop-item" onclick="openSettings('perfil');closeUDrop()"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Meu perfil</div>
+      <div class="udrop-item" onclick="openSettings('conta');closeUDrop()"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Configurações</div>
+      <div class="udrop-item" onclick="openSettings('notif');closeUDrop()"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 0 1 5 5v2l1.5 2.5h-13L3 9V7a5 5 0 0 1 5-5zM6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Notificações</div>
+      <div class="udrop-item" onclick="openSettings('plano');closeUDrop()"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span>Plano Pro</span><span style="margin-left:auto;font-size:9.5px;background:var(--g-bg);color:var(--g-txt);padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0">Ativo</span></div>
+      <div class="udrop-sep"></div>
+      <div class="udrop-item danger" onclick="closeUDrop();toast('Sessão encerrada. Até logo, Sr. Wayne!','trash')"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3H3v10h3M10 11l4-4-4-4M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Sair da conta</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div id="main">
+  <header id="topbar">
+    <div class="tb-title-wrap">
+      <div class="tb-title" id="pg-title">Home</div>
+      <div class="tb-sub" id="pg-sub">Bem-vindo de volta, Sr. Wayne</div>
+    </div>
+    <div class="tb-acts">
+      <button class="btn btn-ghost btn-sm" onclick="openTxModal(null,'despesa')">
+        <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 11.5V1.5M1.5 6.5h10" stroke="var(--r-txt)" stroke-width="2" stroke-linecap="round"/></svg>
+        Adicionar gasto
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="openTxModal(null,'receita')">
+        <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        Adicionar receita
+      </button>
+    </div>
+  </header>
+
+  <div id="scroller">
+
+    <!-- ══ HOME ══ -->
+    <div class="page active" id="pg-home">
+
+      <!-- ░░ HERO — WebGL wave + content ░░ -->
+      <div class="home-hero">
+        <!-- WebGL canvas (sits behind content) -->
+        <div id="wave-canvas-wrap"></div>
+
+        <!-- Content layer -->
+        <div class="hero-content">
+          <div class="hero-top-row">
+            <div class="hero-left">
+              <div class="hero-greeting">Olá, Sr. Wayne 👋</div>
+              <div class="hero-name" id="home-greeting">Bem-vindo de volta.</div>
+              <div class="hero-sub">Aqui está um resumo do seu patrimônio hoje.</div>
+            </div>
+          </div>
+
+          <div class="hero-bal-wrap">
+            <div class="hero-bal-label">Saldo disponível</div>
+            <div class="hero-bal" id="h-bal">—</div>
+            <div class="hero-bal-trend">↑ 8,2% em relação ao mês anterior</div>
+          </div>
+
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <div class="hero-metric-label">Receitas · Abr</div>
+              <div class="hero-metric-val pos" id="h-in">—</div>
+              <div class="hero-metric-chg">↑ 12% vs março</div>
+            </div>
+            <div class="hero-metric">
+              <div class="hero-metric-label">Despesas · Abr</div>
+              <div class="hero-metric-val neg" id="h-out">—</div>
+              <div class="hero-metric-chg">↑ 4% vs março</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ░░ MIDDLE ROW — quick actions (left) + recent tx (right) ░░ -->
+      <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:14px;align-items:start">
+
+        <!-- Quick actions -->
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--tx-3);margin-bottom:10px">Ações rápidas</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="qa-btn" onclick="openTxModal(null,'receita')">
+              <div class="qa-ico qa-ico-g">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M4 7l4-4 4 4" stroke="var(--g-7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div><div class="qa-label">Adicionar receita</div><div class="qa-desc">Registrar entrada de dinheiro</div></div>
+              <svg style="margin-left:auto;flex-shrink:0;color:var(--tx-4)" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="qa-btn" onclick="openTxModal(null,'despesa')">
+              <div class="qa-ico qa-ico-r">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M4 9l4 4 4-4" stroke="var(--r-7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div><div class="qa-label">Adicionar gasto</div><div class="qa-desc">Registrar despesa ou saída</div></div>
+              <svg style="margin-left:auto;flex-shrink:0;color:var(--tx-4)" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="qa-btn" onclick="openGoalModal()">
+              <div class="qa-ico qa-ico-b">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="var(--b-7)" stroke-width="1.6"/><circle cx="8" cy="8" r="2.5" stroke="var(--b-7)" stroke-width="1.6"/><circle cx="8" cy="8" r=".8" fill="var(--b-7)"/></svg>
+              </div>
+              <div><div class="qa-label">Criar meta</div><div class="qa-desc">Novo objetivo financeiro</div></div>
+              <svg style="margin-left:auto;flex-shrink:0;color:var(--tx-4)" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="qa-btn" onclick="goto('calendario')">
+              <div class="qa-ico qa-ico-a">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--a-txt)"><path d="M5 1v2H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-2V1h-1.5v2h-3V1H5zm-2 5h10v7H3V6z"/></svg>
+              </div>
+              <div><div class="qa-label">Ver calendário</div><div class="qa-desc">Eventos e vencimentos</div></div>
+              <svg style="margin-left:auto;flex-shrink:0;color:var(--tx-4)" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent transactions preview -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Últimas movimentações</div><div class="card-sub">Atividade recente</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="goto('transacoes')">Ver todas →</button>
+          </div>
+          <div id="home-recent-tx"></div>
+          <div style="padding:14px 20px;border-top:1px solid var(--br)">
+            <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="openTxModal()">
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Nova transação
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ░░ BOTTOM ROW — nav cards ░░ -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--tx-3);margin-bottom:10px">Navegar para</div>
+        <div class="hnav-grid">
+          <div class="hnav" style="--hn-c:var(--ink)" onclick="goto('dashboard')">
+            <div class="hn-ico hn-ico-k"><svg width="20" height="20" viewBox="0 0 16 16" fill="var(--tx-2)"><path d="M2 2h5.5v5.5H2V2zm0 6.5h5.5V14H2V8.5zm6.5-6.5H14v5.5H8.5V2zm0 6.5H14V14H8.5V8.5z"/></svg></div>
+            <div><div class="hn-label">Dashboard</div><div class="hn-desc">KPIs, gráficos e visão geral.</div></div>
+            <div class="hn-arr">→</div>
+          </div>
+          <div class="hnav" style="--hn-c:var(--g-str)" onclick="goto('transacoes')">
+            <div class="hn-ico hn-ico-g"><svg width="20" height="20" viewBox="0 0 16 16" fill="var(--g-txt)"><path d="M2 4h12v1.5H2V4zm0 3.5h12V9H2V7.5zm0 3.5h9v1.5H2V11z"/></svg></div>
+            <div><div class="hn-label">Transações</div><div class="hn-desc">Todas as receitas e despesas.</div></div>
+            <div class="hn-arr">→</div>
+          </div>
+          <div class="hnav" style="--hn-c:var(--b-str)" onclick="goto('projetos')">
+            <div class="hn-ico hn-ico-b"><svg width="20" height="20" viewBox="0 0 16 16" fill="var(--b-txt)"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a5 5 0 1 1 0 10A5 5 0 0 1 8 3zm0 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm0 1.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg></div>
+            <div><div class="hn-label">Projetos & Metas</div><div class="hn-desc">Seus objetivos e progresso.</div></div>
+            <div class="hn-arr">→</div>
+          </div>
+          <div class="hnav" style="--hn-c:var(--a-5)" onclick="goto('distribuicao')">
+            <div class="hn-ico hn-ico-a"><svg width="20" height="20" viewBox="0 0 16 16" fill="var(--a-txt)"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm0 1.5a4.5 4.5 0 0 1 4.24 5.97H8V3.5zM3.76 9.47A4.5 4.5 0 0 1 7.5 3.55v5.45L3.76 9.47z"/></svg></div>
+            <div><div class="hn-label">Distribuição</div><div class="hn-desc">Análise de gastos por categoria.</div></div>
+            <div class="hn-arr">→</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page" id="pg-dashboard">
+      <!-- Hero saldo -->
+      <div class="dash-hero">
+        <div class="dh-label">Saldo Total · Abril 2025</div>
+        <div class="dh-bal" id="d-bal">—</div>
+        <div class="dh-trend">↑ 8,2% em relação ao mês anterior</div>
+        <div class="dh-metrics">
+          <div class="dh-m">
+            <div class="dh-m-label">Receitas</div>
+            <div class="dh-m-val pos" id="d-in">—</div>
+            <div class="dh-m-sub">↑ 12% vs março</div>
+          </div>
+          <div class="dh-m">
+            <div class="dh-m-label">Despesas</div>
+            <div class="dh-m-val neg" id="d-out">—</div>
+            <div class="dh-m-sub">↑ 4% vs março</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi k-g">
+          <div class="kpi-top">
+            <div class="kpi-ic kpi-ic-g"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M4 7l4-4 4 4" stroke="var(--g-7)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="kpi-badge kb-up">↑ 12%</span>
+          </div>
+          <div class="kpi-label">Total de receitas</div>
+          <div class="kpi-val c-g" id="k-in">—</div>
+          <div class="kpi-sub">Este mês vs anterior</div>
+        </div>
+        <div class="kpi k-r">
+          <div class="kpi-top">
+            <div class="kpi-ic kpi-ic-r"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M4 9l4 4 4-4" stroke="var(--r-7)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="kpi-badge kb-dn">↑ 4%</span>
+          </div>
+          <div class="kpi-label">Total de despesas</div>
+          <div class="kpi-val c-r" id="k-out">—</div>
+          <div class="kpi-sub">Este mês vs anterior</div>
+        </div>
+        <div class="kpi k-b">
+          <div class="kpi-top">
+            <div class="kpi-ic kpi-ic-b"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 8l3 3 5-6" stroke="var(--b-7)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="kpi-badge kb-up">↑ Saudável</span>
+          </div>
+          <div class="kpi-label">Taxa de poupança</div>
+          <div class="kpi-val c-b" id="k-rate">—</div>
+          <div class="kpi-sub">Receita não comprometida</div>
+        </div>
+      </div>
+
+      <!-- Row: monthly + recent -->
+      <div class="g2-3">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Acompanhamento mensal</div><div class="card-sub">Abril 2025</div></div>
+          </div>
+          <div class="card-body">
+            <div class="mbar-list">
+              <div class="mbar-row">
+                <div class="mbar-info"><span class="mbar-label">Receitas</span><span class="mbar-val" id="mb-in">—</span></div>
+                <div class="mbar-track"><div class="mbar-fill mf-g" id="mb-in-b" style="width:0%"></div></div>
+              </div>
+              <div class="mbar-row">
+                <div class="mbar-info"><span class="mbar-label">Despesas</span><span class="mbar-val" id="mb-out">—</span></div>
+                <div class="mbar-track"><div class="mbar-fill mf-r" id="mb-out-b" style="width:0%"></div></div>
+              </div>
+              <div class="mbar-row">
+                <div class="mbar-info"><span class="mbar-label">Saldo líquido</span><span class="mbar-val" id="mb-net">—</span></div>
+                <div class="mbar-track"><div class="mbar-fill mf-b" id="mb-net-b" style="width:0%"></div></div>
+              </div>
+            </div>
+            <!-- Comparison -->
+            <div class="cmp-row">
+              <span class="cmp-ico">📊</span>
+              <span class="cmp-txt">vs mês anterior: ganhou mais</span>
+              <span class="cmp-val pos" id="cmp-val">—</span>
+            </div>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--br)">
+              <div class="card-sub" style="margin-bottom:12px">Histórico 6 meses</div>
+              <div class="chart-box" style="height:128px">
+                <canvas id="ch-m" role="img" aria-label="Histórico mensal">Dados mensais.</canvas>
+              </div>
+              <div style="display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:11.5px;color:var(--tx-3);font-weight:600">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--g-str);display:inline-block"></span>Receitas</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--r-str);display:inline-block"></span>Despesas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Últimas transações</div><div class="card-sub">Atividade recente</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="goto('transacoes')">Ver todas →</button>
+          </div>
+          <div id="dash-recent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TRANSAÇÕES ══ -->
+    <div class="page" id="pg-transacoes">
+      <div class="strip" id="strip">
+        <div class="strip-item">
+          <div class="strip-label">Registros</div>
+          <div class="strip-val" id="st-ct">—</div>
+          <div class="strip-sub">Total no período</div>
+        </div>
+        <div class="strip-item">
+          <div class="strip-label">Receitas</div>
+          <div class="strip-val pos" id="st-in">—</div>
+          <div class="strip-sub">Entradas</div>
+        </div>
+        <div class="strip-item">
+          <div class="strip-label">Despesas</div>
+          <div class="strip-val neg" id="st-out">—</div>
+          <div class="strip-sub">Saídas</div>
+        </div>
+        <div class="strip-item">
+          <div class="strip-label">Saldo</div>
+          <div class="strip-val" id="st-net">—</div>
+          <div class="strip-sub">Resultado</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Todas as transações</div></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="tx-filters" id="chips">
+              <button class="chip on" onclick="setFilter('todos',this)">Todos</button>
+              <button class="chip" onclick="setFilter('receita',this)">Receitas</button>
+              <button class="chip" onclick="setFilter('despesa',this)">Despesas</button>
+              <button class="chip" onclick="setFilter('pix',this)">Pix</button>
+              <button class="chip" onclick="setFilter('cartao',this)">Cartão</button>
+              <button class="chip" onclick="setFilter('dinheiro',this)">Dinheiro</button>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openTxModal()">+ Nova</button>
+          </div>
+        </div>
+        <div class="tx-list" id="tx-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ PROJETOS ══ -->
+    <div class="page" id="pg-projetos">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;color:var(--tx-1)">Projetos & Metas</div>
+          <div style="font-size:13px;color:var(--tx-3);margin-top:4px;font-weight:500">Acompanhe seus objetivos financeiros</div>
+        </div>
+        <button class="btn btn-primary" onclick="openGoalModal()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          Nova Meta
+        </button>
+      </div>
+      <div class="goals-grid" id="goals-grid"></div>
+    </div>
+
+    <!-- ══ CALENDÁRIO ══ -->
+    <div class="page" id="pg-calendario">
+      <div class="cal-nav">
+        <div class="cal-nav-l">
+          <div class="cal-month" id="cal-month">Abril</div>
+          <span class="cal-yr" id="cal-yr">2025</span>
+          <div style="display:flex;gap:4px">
+            <button class="cal-arr" onclick="calMove(-1)"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="cal-arr" onclick="calToday()" style="font-size:11px;font-weight:700;width:auto;padding:0 10px;color:var(--tx-2)">Hoje</button>
+            <button class="cal-arr" onclick="calMove(1)"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--tx-3);font-weight:600">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--g-str);display:inline-block"></span>Salário</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--b-str);display:inline-block"></span>Extra</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--r-str);display:inline-block"></span>Gasto fixo</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--a-5);display:inline-block"></span>Recorrente</span>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openCalModal()">+ Novo evento</button>
+        </div>
+      </div>
+      <div class="g3-2" style="align-items:start">
+        <div class="cal-grid-wrap">
+          <div class="cal-wdays"><div class="cal-wd">Dom</div><div class="cal-wd">Seg</div><div class="cal-wd">Ter</div><div class="cal-wd">Qua</div><div class="cal-wd">Qui</div><div class="cal-wd">Sex</div><div class="cal-wd">Sáb</div></div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="card-hd"><div><div class="card-title">Próximos eventos</div><div class="card-sub" id="cal-up-sub">Este mês</div></div></div>
+            <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px" id="cal-up-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Resumo do mês</div></div>
+            <div class="card-body" style="padding:14px 20px"><div id="cal-summary"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DISTRIBUIÇÃO ══ -->
+    <div class="page" id="pg-distribuicao">
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;color:var(--tx-1)">Distribuição</div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Por categoria (despesas)</div></div>
+          <div class="card-body">
+            <div class="chart-box" style="height:190px;margin-bottom:16px"><canvas id="ch-cat" role="img" aria-label="Por categoria">Dados.</canvas></div>
+            <div class="dist-list" id="dist-cat"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Por método de pagamento</div></div>
+          <div class="card-body">
+            <div class="chart-box" style="height:190px;margin-bottom:16px"><canvas id="ch-met" role="img" aria-label="Por método">Dados.</canvas></div>
+            <div class="dist-list" id="dist-met"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /scroller -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ══ MODAL TX ══ -->
+<div class="overlay" id="ov-tx">
+  <div class="modal">
+    <div class="modal-hd"><span class="modal-title" id="tx-title">Nova Transação</span><button class="modal-close" onclick="closeTxModal()">×</button></div>
+    <div class="form-body">
+      <div class="fg fg-full"><label class="lbl">Tipo *</label>
+        <div class="type-tog"><div class="tt-opt" id="tt-in" onclick="selType('receita')">↑ Receita</div><div class="tt-opt" id="tt-out" onclick="selType('despesa')">↓ Despesa</div></div>
+        <div class="err-msg" id="e-tipo"></div></div>
+      <div class="fg fg-full"><label class="lbl">Descrição *</label><input class="inp" id="f-desc" type="text" placeholder="Ex: Salário, Aluguel, Mercado…"><div class="err-msg" id="e-desc"></div></div>
+      <div class="fg-row">
+        <div class="fg"><label class="lbl">Valor (R$) *</label><input class="inp" id="f-val" type="number" min="0.01" step="0.01" placeholder="0,00"><div class="err-msg" id="e-val"></div></div>
+        <div class="fg"><label class="lbl">Data</label><input class="inp" id="f-data" type="date"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="lbl">Método</label>
+          <select class="inp" id="f-met"><option value="pix">Pix</option><option value="cartao">Cartão crédito</option><option value="debito">Cartão débito</option><option value="dinheiro">Dinheiro</option><option value="boleto">Boleto</option><option value="ted">TED / DOC</option></select>
+        </div>
+        <div class="fg"><label class="lbl">Categoria</label>
+          <select class="inp" id="f-cat"><option value="geral">Geral</option><option value="alimentação">Alimentação</option><option value="moradia">Moradia</option><option value="transporte">Transporte</option><option value="saúde">Saúde</option><option value="educação">Educação</option><option value="lazer">Lazer</option><option value="assinaturas">Assinaturas</option><option value="vestuário">Vestuário</option><option value="salário">Salário</option><option value="freelance">Freelance</option><option value="investimentos">Investimentos</option><option value="outros">Outros</option></select>
+        </div>
+      </div>
+      <div class="form-foot"><button class="btn btn-ghost" onclick="closeTxModal()">Cancelar</button><button class="btn btn-primary" id="tx-submit" onclick="submitTx()">Adicionar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL GOAL ══ -->
+<div class="overlay" id="ov-goal">
+  <div class="modal modal-sm">
+    <div class="modal-hd"><span class="modal-title" id="goal-title">Nova Meta</span><button class="modal-close" onclick="closeGoalModal()">×</button></div>
+    <div class="form-body">
+      <div class="fg-row">
+        <div class="fg" style="max-width:76px"><label class="lbl">Emoji</label><input class="inp" id="g-emoji" type="text" placeholder="🎯" maxlength="4" style="font-size:20px;text-align:center"></div>
+        <div class="fg" style="flex:1"><label class="lbl">Nome *</label><input class="inp" id="g-nome" type="text" placeholder="Ex: Reserva de emergência"><div class="err-msg" id="e-gnome"></div></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="lbl">Valor alvo (R$)</label><input class="inp" id="g-alvo" type="number" min="1" placeholder="10000"></div>
+        <div class="fg"><label class="lbl">Valor atual (R$)</label><input class="inp" id="g-atual" type="number" min="0" placeholder="0"></div>
+      </div>
+      <div class="form-foot"><button class="btn btn-ghost" onclick="closeGoalModal()">Cancelar</button><button class="btn btn-primary" id="goal-submit" onclick="submitGoal()">Criar Meta</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CAL ══ -->
+<div class="overlay" id="ov-cal">
+  <div class="modal modal-sm">
+    <div class="modal-hd"><span class="modal-title" id="cal-title">Novo Evento</span><button class="modal-close" onclick="closeCalModal()">×</button></div>
+    <div class="form-body">
+      <div class="fg fg-full"><label class="lbl">Tipo *</label>
+        <div class="ev-tg">
+          <div class="ev-topt" data-ev="salario" onclick="selEvT('salario',this)">💰 Salário</div>
+          <div class="ev-topt" data-ev="extra"   onclick="selEvT('extra',this)">✨ Extra</div>
+          <div class="ev-topt" data-ev="fixo"    onclick="selEvT('fixo',this)">🏠 Gasto Fixo</div>
+          <div class="ev-topt" data-ev="recorrente" onclick="selEvT('recorrente',this)">🔄 Recorrente</div>
+          <div class="ev-topt" data-ev="vencimento" onclick="selEvT('vencimento',this)">⚠️ Vencimento</div>
+          <div class="ev-topt" data-ev="outro"   onclick="selEvT('outro',this)">📌 Outro</div>
+        </div>
+        <div class="err-msg" id="e-evt"></div></div>
+      <div class="fg fg-full"><label class="lbl">Título *</label><input class="inp" id="ev-tit" type="text" placeholder="Ex: Salário, Conta de luz…"><div class="err-msg" id="e-evt"></div></div>
+      <div class="fg-row">
+        <div class="fg"><label class="lbl">Data *</label><input class="inp" id="ev-dat" type="date"></div>
+        <div class="fg"><label class="lbl">Valor (R$)</label><input class="inp" id="ev-val" type="number" min="0" step="0.01" placeholder="0,00"></div>
+      </div>
+      <div class="fg fg-full"><label class="lbl">Observação</label><input class="inp" id="ev-obs" type="text" placeholder="Nota…"></div>
+      <div class="form-foot"><button class="btn btn-ghost" onclick="closeCalModal()">Cancelar</button><button class="btn btn-primary" id="cal-submit" onclick="submitCal()">Salvar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM ══ -->
+<div class="conf-overlay" id="ov-conf">
+  <div class="conf-box">
+    <div class="conf-title" id="conf-title">Confirmar exclusão</div>
+    <div class="conf-msg" id="conf-msg">Esta ação não pode ser desfeita.</div>
+    <div class="conf-acts">
+      <button class="btn btn-ghost" onclick="cancelConf()">Cancelar</button>
+      <button class="btn btn-danger" id="conf-ok">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast"><svg id="t-ico" width="14" height="14" viewBox="0 0 14 14" fill="none"></svg><span id="t-msg"></span></div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="set-overlay" id="ov-set">
+  <div class="set-modal">
+    <div class="set-top">
+      <span class="set-title">Configurações</span>
+      <button class="modal-close" onclick="closeSettings()">×</button>
+    </div>
+    <div class="set-body">
+      <div class="set-tabs">
+        <div class="stab active" onclick="switchStab('perfil',this)"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Perfil</div>
+        <div class="stab" onclick="switchStab('conta',this)"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Conta</div>
+        <div class="stab" onclick="switchStab('aparencia',this)"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M5 8a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Aparência</div>
+        <div class="stab" onclick="switchStab('notif',this)"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 0 1 5 5v2l1.5 2.5h-13L3 9V7a5 5 0 0 1 5-5zM6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Notificações</div>
+        <div class="stab" onclick="switchStab('financeiro',this)"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 7h12M6 4V3M10 4V3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Financeiro</div>
+        <div class="stab" onclick="switchStab('privacidade',this)"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L3 4.5V8c0 3 2.2 5.5 5 6.5 2.8-1 5-3.5 5-6.5V4.5L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Privacidade</div>
+        <div class="stab" onclick="switchStab('plano',this)"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Plano</div>
+      </div>
+      <div class="set-panel">
+        <div class="spanel active" id="sp-perfil">
+          <div class="prof-head"><div class="prof-ava">BW</div><div><div class="prof-name">Bruce Wayne</div><div class="prof-role">Empresário · Gotham City</div><button class="btn btn-ghost btn-xs" style="margin-top:8px">Alterar foto</button></div></div>
+          <div class="sgroup"><div class="sg-title">Informações pessoais</div>
+            <div class="fg-row"><div class="fg"><label class="lbl">Nome completo</label><input class="inp" value="Bruce Wayne"></div><div class="fg"><label class="lbl">Apelido</label><input class="inp" value="Bruce"></div></div>
+            <div class="fg"><label class="lbl">E-mail</label><input class="inp" value="bruce@wayne.com" type="email"></div>
+            <div class="fg-row"><div class="fg"><label class="lbl">Telefone</label><input class="inp" value="+55 (11) 99999-0000"></div><div class="fg"><label class="lbl">CPF</label><input class="inp" value="000.000.000-00"></div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary btn-sm" onclick="toast('Perfil salvo!')">Salvar alterações</button></div>
+        </div>
+        <div class="spanel" id="sp-conta">
+          <div class="sgroup"><div class="sg-title">Acesso e senha</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">E-mail</div><div class="sr-desc">bruce@wayne.com</div></div><button class="btn btn-ghost btn-xs">Alterar</button></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Senha</div><div class="sr-desc">Última alteração há 30 dias</div></div><button class="btn btn-ghost btn-xs">Alterar</button></div>
+          </div>
+          <div class="sgroup"><div class="sg-title">Segurança</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Autenticação 2 fatores</div><div class="sr-desc">Proteção extra via app autenticador</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Encerrar sessão automaticamente</div><div class="sr-desc">Após período de inatividade</div></div><select class="sinp sr-ctrl"><option>30 min</option><option selected>1 hora</option><option>8 horas</option></select></div>
+          </div>
+        </div>
+        <div class="spanel" id="sp-aparencia">
+          <div class="sgroup"><div class="sg-title">Tema</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Modo escuro</div><div class="sr-desc">Alterna entre tema claro e escuro</div></div><div class="stog sr-ctrl" id="set-dark-tog" onclick="toggleDarkFromSet()"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Idioma</div></div><select class="sinp sr-ctrl"><option selected>Português (BR)</option><option>English</option><option>Español</option></select></div>
+          </div>
+          <div class="sgroup"><div class="sg-title">Layout</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Sidebar compacta por padrão</div><div class="sr-desc">Inicia com ícones apenas</div></div><div class="stog sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Reduzir animações</div><div class="sr-desc">Para acessibilidade</div></div><div class="stog sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+          </div>
+        </div>
+        <div class="spanel" id="sp-notif">
+          <div class="sgroup"><div class="sg-title">Alertas financeiros</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Vencimentos próximos</div><div class="sr-desc">Aviso 3 dias antes</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Metas atingidas</div><div class="sr-desc">Celebre objetivos concluídos</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Resumo semanal</div><div class="sr-desc">Relatório toda segunda-feira</div></div><div class="stog sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Gastos acima do limite</div><div class="sr-desc">Alerta ao superar 80% da receita</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+          </div>
+          <div class="sgroup"><div class="sg-title">Canais</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">E-mail</div><div class="sr-desc">bruce@wayne.com</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Push no navegador</div></div><div class="stog sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+          </div>
+        </div>
+        <div class="spanel" id="sp-financeiro">
+          <div class="sgroup"><div class="sg-title">Preferências</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Moeda</div></div><select class="sinp sr-ctrl"><option selected>R$ — Real</option><option>$ — Dólar</option><option>€ — Euro</option></select></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Dia de fechamento</div></div><select class="sinp sr-ctrl"><option>Dia 1</option><option>Dia 5</option><option selected>Dia 10</option><option>Dia 15</option><option>Dia 20</option><option>Dia 25</option></select></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Dia do salário</div></div><select class="sinp sr-ctrl"><option>Dia 1</option><option selected>Dia 5</option><option>Dia 10</option><option>Dia 15</option><option>Dia 20</option><option>Dia 30</option></select></div>
+          </div>
+          <div class="sgroup"><div class="sg-title">Orçamento</div>
+            <div class="fg"><label class="lbl">Limite de gastos mensais (R$)</label><input class="inp" type="number" value="5000" placeholder="5000"></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Alertar ao atingir 80%</div></div><div class="stog on sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary btn-sm" onclick="toast('Preferências salvas!')">Salvar</button></div>
+        </div>
+        <div class="spanel" id="sp-privacidade">
+          <div class="sgroup"><div class="sg-title">Dados</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Compartilhar dados anônimos</div><div class="sr-desc">Ajuda a melhorar o produto</div></div><div class="stog sr-ctrl" onclick="this.classList.toggle('on')"><div class="stog-d"></div></div></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Exportar dados</div><div class="sr-desc">CSV ou PDF com todas transações</div></div><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-xs" onclick="toast('Exportando CSV…')">CSV</button><button class="btn btn-ghost btn-xs" onclick="toast('Exportando PDF…')">PDF</button></div></div>
+          </div>
+          <div class="danger-zone"><div class="dz-title">⚠ Zona de risco</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Apagar histórico</div><div class="sr-desc" style="color:var(--r-txt)">Remove todos os registros permanentemente</div></div><button class="btn btn-danger btn-xs" onclick="toast('Requer confirmação por e-mail.','trash')">Apagar</button></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Excluir conta</div><div class="sr-desc" style="color:var(--r-txt)">Remove sua conta e todos os dados</div></div><button class="btn btn-danger btn-xs" onclick="toast('Requer confirmação por e-mail.','trash')">Excluir</button></div>
+          </div>
+        </div>
+        <div class="spanel" id="sp-plano">
+          <div class="plan-hero"><div><div class="plan-name">Plano Pro</div><div class="plan-desc">Acesso completo a todas as funcionalidades</div></div><span class="plan-badge">✓ Ativo</span></div>
+          <div class="sgroup"><div class="sg-title">Recursos incluídos</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--tx-1);font-weight:500">
+              <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--g-7);font-weight:800;font-size:15px">✓</span>Transações ilimitadas</div>
+              <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--g-7);font-weight:800;font-size:15px">✓</span>Projetos e metas ilimitados</div>
+              <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--g-7);font-weight:800;font-size:15px">✓</span>Calendário financeiro anual</div>
+              <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--g-7);font-weight:800;font-size:15px">✓</span>Relatórios e exportação</div>
+              <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--g-7);font-weight:800;font-size:15px">✓</span>Suporte prioritário 24/7</div>
+            </div>
+          </div>
+          <div class="sgroup"><div class="sg-title">Faturamento</div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Próxima cobrança</div><div class="sr-desc">R$ 29,90 · 1 de maio de 2025</div></div><button class="btn btn-ghost btn-xs">Gerenciar</button></div>
+            <div class="srow"><div class="sr-info"><div class="sr-label">Método de pagamento</div><div class="sr-desc">•••• 1234 · Visa</div></div><button class="btn btn-ghost btn-xs">Alterar</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+<!-- Lógica da aplicação -->
+<script src="script.js"></script>
+</html>
