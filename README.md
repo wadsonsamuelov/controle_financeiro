@@ -1,6 +1,8 @@
-# 💰 FinTrack — Gestão Financeira
+# FinTrack — Gestão Financeira
 
-Sistema web para controle financeiro pessoal com foco em organização, visualização de dados e simplicidade de uso.
+O FinTrack é um sistema de gestão financeira pessoal desenvolvido com foco em simplicidade, organização e visual moderno.
+
+O objetivo é permitir que usuários controlem suas finanças de forma prática, visual e eficiente, acompanhando receitas, despesas, metas e eventos financeiros.
 
 ---
 
