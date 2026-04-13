@@ -53,6 +53,7 @@ src/
 ## Status
 
 Projeto em desenvolvimento.
+Versão 1.0
 
 ---
 
