@@ -6,7 +6,7 @@ O objetivo é permitir que usuários controlem suas finanças de forma prática,
 
 ---
 
-## 📌 Funcionalidades
+## Funcionalidades
 
 * Cadastro de receitas e despesas
 * Dashboard com indicadores e gráficos
@@ -18,7 +18,7 @@ O objetivo é permitir que usuários controlem suas finanças de forma prática,
 
 ---
 
-## 🧠 Tecnologias
+## Tecnologias
 
 * HTML5
 * CSS3
@@ -28,7 +28,7 @@ O objetivo é permitir que usuários controlem suas finanças de forma prática,
 
 ---
 
-## 🚀 Como executar
+## Como executar
 
 ```bash
 git clone https://github.com/wadsonsamuelov/controle_financeiro.git
@@ -50,13 +50,13 @@ src/
 
 ---
 
-## 📊 Status
+## Status
 
 Projeto em desenvolvimento.
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 Wadson Samuel
 https://github.com/wadsonsamuelov
