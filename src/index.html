@@ -71,6 +71,10 @@
         <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm0 1.5a4.5 4.5 0 0 1 4.24 5.97H8V3.5zM3.76 9.47A4.5 4.5 0 0 1 7.5 3.55v5.45L3.76 9.47z"/></svg>
         <span class="nav-lbl">Distribuição</span>
       </a>
+      <a class="nav-item" data-tip="Câmbio" onclick="goto('cambio',this)" href="#">
+        <svg class="nav-ic" viewBox="0 0 16 16" fill="currentColor"><path d="M2 5h8.5M8 3l2.5 2L8 7M14 11H5.5M8 13l-2.5-2L8 9"/></svg>
+        <span class="nav-lbl">Câmbio</span>
+      </a>
     </div>
   </nav>
 
@@ -466,6 +470,72 @@
             <div class="dist-list" id="dist-met"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ CÂMBIO ══ -->
+    <div class="page" id="pg-cambio">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px">
+        <div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;color:var(--tx-1)">Câmbio ao Vivo</div>
+          <div style="font-size:13px;color:var(--tx-3);margin-top:4px;font-weight:500">Cotações em tempo real · AwesomeAPI</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="cambioLoad()" id="cambio-refresh-btn">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.4.87 4.4 2.2M13.5 2v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Atualizar
+        </button>
+      </div>
+      <div id="cambio-status" style="font-size:11.5px;color:var(--tx-3);font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:6px">
+        <span id="cambio-status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--tx-4);display:inline-block;flex-shrink:0"></span>
+        <span id="cambio-status-txt">Aguardando...</span>
+      </div>
+      <div id="cambio-cards" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px">
+        <div class="card" style="height:130px;opacity:.4"></div>
+        <div class="card" style="height:130px;opacity:.4"></div>
+        <div class="card" style="height:130px;opacity:.4"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Conversor de Moedas</div><div class="card-sub">Calcule equivalências em tempo real</div></div>
+        </div>
+        <div class="card-body" style="padding:20px 24px">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end">
+            <div>
+              <label class="lbl" style="display:block;margin-bottom:6px">De</label>
+              <select class="inp" id="conv-from" onchange="calcConv()">
+                <option value="BRL">🇧🇷 Real (BRL)</option>
+                <option value="USD">🇺🇸 Dólar (USD)</option>
+                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                <option value="BTC">₿ Bitcoin (BTC)</option>
+              </select>
+            </div>
+            <div style="padding-bottom:10px">
+              <button onclick="swapConv()" style="background:var(--bg-muted);border:1px solid var(--br-md);border-radius:var(--r-md);width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx-2)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5h8.5M8 3l2.5 2L8 7M14 11H5.5M8 13l-2.5-2L8 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div>
+              <label class="lbl" style="display:block;margin-bottom:6px">Para</label>
+              <select class="inp" id="conv-to" onchange="calcConv()">
+                <option value="USD">🇺🇸 Dólar (USD)</option>
+                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                <option value="BTC">₿ Bitcoin (BTC)</option>
+                <option value="BRL">🇧🇷 Real (BRL)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <label class="lbl" style="display:block;margin-bottom:6px">Valor</label>
+            <input class="inp" id="conv-val" type="number" min="0" step="0.01" placeholder="Digite o valor..." oninput="calcConv()" style="font-size:18px;font-weight:700;font-family:var(--fm)">
+          </div>
+          <div id="conv-result" style="margin-top:16px;padding:18px 20px;background:var(--bg-muted);border-radius:var(--r-md);min-height:64px;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:13px;color:var(--tx-3);font-weight:500">Digite um valor para converter</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Tabela de referência</div><div class="card-sub">Equivalência de R$ 100,00</div></div></div>
+        <div id="cambio-tabela" style="padding:0 4px 8px"></div>
       </div>
     </div>
 

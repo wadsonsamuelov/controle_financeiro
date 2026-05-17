@@ -106,6 +106,7 @@ const PM={
   projetos:{t:'Projetos & Metas',s:'Seus objetivos financeiros'},
   calendario:{t:'Calendário Financeiro',s:'Eventos e datas importantes'},
   distribuicao:{t:'Distribuição',s:'Análise de gastos por categoria'},
+  cambio:{t:'Câmbio ao Vivo',s:'Cotações em tempo real · AwesomeAPI'},
 };
 function goto(page,el){
   activePage=page;
@@ -125,6 +126,7 @@ function goto(page,el){
   if(page==='calendario') renderCal();
   if(page==='transacoes'){renderStrip();renderTxList();}
   if(page==='home') renderHome();
+  if(page==='cambio') cambioLoad();
   return false;
 }
 
@@ -836,6 +838,119 @@ function renderHomeRecent(){
       <div class="rtx-val ${r?'pos':'neg'}">${r?'+':'−'}${R(t.val)}</div>
     </div>`;
   }).join('');
+}
+
+/* ══ CÂMBIO — AwesomeAPI ══ */
+let cambioRates = {};
+let cambioCarregado = false;
+
+async function cambioLoad() {
+  const btn = document.getElementById('cambio-refresh-btn');
+  const dot = document.getElementById('cambio-status-dot');
+  const txt = document.getElementById('cambio-status-txt');
+  if (btn) btn.disabled = true;
+  if (dot) dot.style.background = 'var(--a-5)';
+  if (txt) txt.textContent = 'Buscando cotações...';
+
+  try {
+    const res = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    cambioRates = {
+      USD: { bid: parseFloat(data.USDBRL.bid), ask: parseFloat(data.USDBRL.ask), pct: parseFloat(data.USDBRL.pctChange), high: parseFloat(data.USDBRL.high), low: parseFloat(data.USDBRL.low), name: 'Dólar', flag: '🇺🇸', code: 'USD' },
+      EUR: { bid: parseFloat(data.EURBRL.bid), ask: parseFloat(data.EURBRL.ask), pct: parseFloat(data.EURBRL.pctChange), high: parseFloat(data.EURBRL.high), low: parseFloat(data.EURBRL.low), name: 'Euro', flag: '🇪🇺', code: 'EUR' },
+      BTC: { bid: parseFloat(data.BTCBRL.bid), ask: parseFloat(data.BTCBRL.ask), pct: parseFloat(data.BTCBRL.pctChange), high: parseFloat(data.BTCBRL.high), low: parseFloat(data.BTCBRL.low), name: 'Bitcoin', flag: '₿', code: 'BTC' },
+    };
+    cambioCarregado = true;
+
+    const agora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    if (dot) dot.style.background = 'var(--g-str)';
+    if (txt) txt.textContent = 'Atualizado às ' + agora + ' · Fonte: AwesomeAPI';
+
+    renderCambioCards();
+    renderCambioTabela();
+    calcConv();
+  } catch (e) {
+    if (dot) dot.style.background = 'var(--r-str)';
+    if (txt) txt.textContent = 'Falha ao buscar cotações. Verifique sua conexão.';
+    const cards = document.getElementById('cambio-cards');
+    if (cards) cards.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--tx-3);font-size:13px;font-weight:500">Não foi possível carregar as cotações.<br><br><button class="btn btn-ghost btn-sm" onclick="cambioLoad()">Tentar novamente</button></div>';
+  }
+  if (btn) btn.disabled = false;
+}
+
+function renderCambioCards() {
+  const el = document.getElementById('cambio-cards');
+  if (!el) return;
+  el.innerHTML = Object.values(cambioRates).map(m => {
+    const up = m.pct >= 0;
+    const cor = up ? 'var(--g-bg)' : 'var(--r-bg)';
+    const ctxt = up ? 'var(--g-txt)' : 'var(--r-txt)';
+    const seta = up ? '▲' : '▼';
+    const casasBid = m.code === 'BTC' ? 2 : 4;
+    const bid = m.bid.toLocaleString('pt-BR', { minimumFractionDigits: casasBid, maximumFractionDigits: casasBid });
+    return `<div class="card" style="padding:20px 22px">
+      <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx-3)">${m.flag} ${m.name} (${m.code})</div>
+      <div style="font-size:26px;font-weight:800;font-family:var(--fm);letter-spacing:-.04em;color:var(--tx-1);margin:8px 0 4px">R$ ${bid}</div>
+      <span style="background:${cor};color:${ctxt};font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:3px">${seta} ${Math.abs(m.pct).toFixed(2)}%</span>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--br);display:flex;gap:16px">
+        <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-4)">Máx</div><div style="font-size:12px;font-weight:600;color:var(--tx-2);font-family:var(--fm)">${m.high.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+        <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-4)">Mín</div><div style="font-size:12px;font-weight:600;color:var(--tx-2);font-family:var(--fm)">${m.low.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+        <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-4)">Venda</div><div style="font-size:12px;font-weight:600;color:var(--tx-2);font-family:var(--fm)">${m.ask.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCambioTabela() {
+  const el = document.getElementById('cambio-tabela');
+  if (!el) return;
+  el.innerHTML = Object.values(cambioRates).map(m => {
+    const qty = 100 / m.bid;
+    const qtyFmt = m.code === 'BTC'
+      ? qty.toFixed(8) + ' BTC'
+      : qty.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + ' ' + m.code;
+    return `<div style="display:flex;align-items:center;padding:11px 20px;border-bottom:1px solid var(--br);gap:14px">
+      <div style="font-size:20px;width:32px;text-align:center;flex-shrink:0">${m.flag}</div>
+      <div style="font-size:13px;font-weight:600;color:var(--tx-1);flex:1">${m.name}</div>
+      <div style="font-size:11px;color:var(--tx-3);font-weight:500;margin-right:8px">R$ 100,00 =</div>
+      <div style="font-size:14px;font-weight:700;font-family:var(--fm);color:var(--tx-1)">${qtyFmt}</div>
+    </div>`;
+  }).join('');
+}
+
+function calcConv() {
+  const res = document.getElementById('conv-result');
+  if (!res) return;
+  const val = parseFloat(document.getElementById('conv-val')?.value);
+  const from = document.getElementById('conv-from')?.value;
+  const to = document.getElementById('conv-to')?.value;
+  if (!cambioCarregado || !val || isNaN(val) || val <= 0) {
+    res.innerHTML = '<span style="font-size:13px;color:var(--tx-3);font-weight:500">Digite um valor para converter</span>';
+    return;
+  }
+  let emBRL = from === 'BRL' ? val : (cambioRates[from] ? val * cambioRates[from].bid : null);
+  if (emBRL === null) return;
+  let resultado = to === 'BRL' ? emBRL : (cambioRates[to] ? emBRL / cambioRates[to].bid : null);
+  if (resultado === null) return;
+  const syms = { BRL: 'R$', USD: 'US$', EUR: '€', BTC: '₿' };
+  const casas = to === 'BTC' ? 8 : 2;
+  const resultFmt = resultado.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  const origFmt = val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  res.innerHTML = `<div style="text-align:center">
+    <div style="font-size:12px;color:var(--tx-3);font-weight:500;margin-bottom:6px">${syms[from]} ${origFmt} =</div>
+    <div style="font-size:30px;font-weight:800;font-family:var(--fm);letter-spacing:-.04em;color:var(--tx-1)">${syms[to]} ${resultFmt}</div>
+    ${from!=='BRL'&&to!=='BRL'?`<div style="font-size:11px;color:var(--tx-4);margin-top:4px;font-weight:500">via R$ ${emBRL.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`:''}
+  </div>`;
+}
+
+function swapConv() {
+  const f = document.getElementById('conv-from');
+  const t = document.getElementById('conv-to');
+  if (!f || !t) return;
+  [f.value, t.value] = [t.value, f.value];
+  calcConv();
 }
 
 /* ══ INIT ══ */
