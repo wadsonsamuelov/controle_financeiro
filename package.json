@@ -1,0 +1,11 @@
+{
+  "name": "controle-financeiro",
+  "version": "1.0.0",
+  "description": "Plataforma web de gestão financeira pessoal",
+  "scripts": {
+    "test": "node tests/api.test.js"
+  },
+  "keywords": ["financeiro", "gestão", "câmbio"],
+  "author": "Wadson Samuel",
+  "license": "MIT"
+}
