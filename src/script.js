@@ -6,7 +6,7 @@
 /* ══ SUPABASE ══ */
 const SUPABASE_URL = 'https://rjaynjwbutcjtyqyowso.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ldWLJiHnXFv_4qkoQUTBpA_PTt2G9qz';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ══════════════════════════════
    STATE
@@ -70,7 +70,7 @@ function loadData() {
 /* ══ TRANSAÇÕES — Supabase ══ */
 async function loadTransacoes() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('transacoes')
       .select('*')
       .order('data', { ascending: false });
@@ -86,7 +86,7 @@ async function loadTransacoes() {
 }
 
 async function addTransacao(rec) {
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('transacoes')
     .insert([rec])
     .select()
@@ -96,7 +96,7 @@ async function addTransacao(rec) {
 }
 
 async function updateTransacao(id, rec) {
-  const { error } = await supabase
+  const { error } = await sb
     .from('transacoes')
     .update(rec)
     .eq('id', id);
@@ -104,7 +104,7 @@ async function updateTransacao(id, rec) {
 }
 
 async function removeTransacao(id) {
-  const { error } = await supabase
+  const { error } = await sb
     .from('transacoes')
     .delete()
     .eq('id', id);
