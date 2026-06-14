@@ -3,6 +3,11 @@
    Gerado a partir de fintrack_v6.html
    Dependências externas: Chart.js (carregado via CDN no HTML)
    ========================================================== */
+/* ══ SUPABASE ══ */
+const SUPABASE_URL = 'https://rjaynjwbutcjtyqyowso.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ldWLJiHnXFv_4qkoQUTBpA_PTt2G9qz';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /* ══════════════════════════════
    STATE
 ══════════════════════════════ */
@@ -16,16 +21,7 @@ const GREETINGS=[
   'Bem-vindo de volta, <strong>Sr. Wayne</strong>.','De volta aos negócios, <strong>Bruce</strong>.','Seu patrimônio está seguro aqui.','Controle total. Decisões mais inteligentes.','Pronto para organizar suas finanças?','Cada real bem gerenciado faz diferença.',
 ];
 
-let TX=[
-  {id:1,desc:'Salário mensal',val:6500,tipo:'receita',met:'ted',cat:'salário',data:'2025-04-01'},
-  {id:2,desc:'Aluguel',val:1800,tipo:'despesa',met:'boleto',cat:'moradia',data:'2025-04-02'},
-  {id:3,desc:'Supermercado',val:342.9,tipo:'despesa',met:'cartao',cat:'alimentação',data:'2025-04-03'},
-  {id:4,desc:'Freelance — Web App',val:2400,tipo:'receita',met:'pix',cat:'freelance',data:'2025-04-05'},
-  {id:5,desc:'Farmácia',val:178.5,tipo:'despesa',met:'cartao',cat:'saúde',data:'2025-04-07'},
-  {id:6,desc:'Streaming + Apps',val:89.9,tipo:'despesa',met:'cartao',cat:'assinaturas',data:'2025-04-08'},
-  {id:7,desc:'Transferência recebida',val:500,tipo:'receita',met:'pix',cat:'geral',data:'2025-04-09'},
-  {id:8,desc:'Combustível',val:220,tipo:'despesa',met:'dinheiro',cat:'transporte',data:'2025-04-10'},
-];
+let TX=[];
 let GOALS=[
   {id:1,emoji:'🏠',nome:'Reserva de emergência',alvo:20000,atual:12000},
   {id:2,emoji:'✈️',nome:'Viagem — Europa',alvo:15000,atual:4500},
@@ -49,7 +45,6 @@ const STORAGE_KEYS = {
 };
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEYS.tx, JSON.stringify(TX));
   localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(GOALS));
   localStorage.setItem(STORAGE_KEYS.cevs, JSON.stringify(CEVS));
   localStorage.setItem(STORAGE_KEYS.dark, JSON.stringify(dark));
@@ -58,13 +53,11 @@ function saveData() {
 
 function loadData() {
   try {
-    const tx = localStorage.getItem(STORAGE_KEYS.tx);
     const goals = localStorage.getItem(STORAGE_KEYS.goals);
     const cevs = localStorage.getItem(STORAGE_KEYS.cevs);
     const darkSaved = localStorage.getItem(STORAGE_KEYS.dark);
     const slimSaved = localStorage.getItem(STORAGE_KEYS.slim);
 
-    if (tx) TX = JSON.parse(tx);
     if (goals) GOALS = JSON.parse(goals);
     if (cevs) CEVS = JSON.parse(cevs);
     if (darkSaved !== null) dark = JSON.parse(darkSaved);
@@ -72,6 +65,50 @@ function loadData() {
   } catch (error) {
     console.error('Erro ao carregar dados do localStorage:', error);
   }
+}
+
+/* ══ TRANSAÇÕES — Supabase ══ */
+async function loadTransacoes() {
+  try {
+    const { data, error } = await supabase
+      .from('transacoes')
+      .select('*')
+      .order('data', { ascending: false });
+    if (error) throw error;
+    TX = (data || []).map(r => ({
+      id: r.id, desc: r.desc, val: parseFloat(r.val),
+      tipo: r.tipo, met: r.met, cat: r.cat, data: r.data
+    }));
+  } catch (e) {
+    console.error('Erro ao carregar transações do Supabase:', e);
+    toast('Não foi possível carregar dados do banco.', 'erro');
+  }
+}
+
+async function addTransacao(rec) {
+  const { data, error } = await supabase
+    .from('transacoes')
+    .insert([rec])
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, desc: data.desc, val: parseFloat(data.val), tipo: data.tipo, met: data.met, cat: data.cat, data: data.data };
+}
+
+async function updateTransacao(id, rec) {
+  const { error } = await supabase
+    .from('transacoes')
+    .update(rec)
+    .eq('id', id);
+  if (error) throw error;
+}
+
+async function removeTransacao(id) {
+  const { error } = await supabase
+    .from('transacoes')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
 }
 
 function applySavedUIState() {
@@ -387,7 +424,7 @@ function refreshTypeTog(){
   document.getElementById('tt-in').className='tt-opt'+(selType_==='receita'?' sel-in':'');
   document.getElementById('tt-out').className='tt-opt'+(selType_==='despesa'?' sel-out':'');
 }
-function submitTx(){
+async function submitTx(){
   const desc=document.getElementById('f-desc').value.trim();
   const val=parseFloat(document.getElementById('f-val').value);
   let ok=true;
@@ -398,19 +435,37 @@ function submitTx(){
   if(!val||val<=0){document.getElementById('e-val').textContent='Valor inválido.';document.getElementById('f-val').classList.add('err');ok=false}
   if(!ok) return;
   const rec={desc,val,tipo:selType_,met:document.getElementById('f-met').value,cat:document.getElementById('f-cat').value,data:document.getElementById('f-data').value||new Date().toISOString().slice(0,10)};
-  if(editTxId){const i=TX.findIndex(t=>t.id===editTxId);if(i>-1)TX[i]={...TX[i],...rec};toast('Transação atualizada!')}
-  else{TX.push({id:nextId++,...rec});toast('Transação adicionada!')}
-  saveData();
-closeTxModal();
-renderAll();
+  try{
+    if(editTxId){
+      await updateTransacao(editTxId, rec);
+      const i=TX.findIndex(t=>t.id===editTxId);if(i>-1)TX[i]={...TX[i],...rec};
+      toast('Transação atualizada!');
+    } else {
+      const novo = await addTransacao(rec);
+      TX.push(novo);
+      toast('Transação adicionada!');
+    }
+    saveData();
+    closeTxModal();
+    renderAll();
+  }catch(e){
+    console.error('Erro ao salvar transação:', e);
+    toast('Erro ao salvar no banco de dados.','erro');
+  }
 }
 function deleteTx(id){
   const t=TX.find(x=>x.id===id);if(!t)return;
-  conf_('Excluir transação',`Excluir "${t.desc}"?`,()=>{
-    const row=document.getElementById('tr-'+id);
-    if(row){row.classList.add('removing');setTimeout(()=>{TX=TX.filter(x=>x.id!==id);renderAll()},300)}
-    else{TX=TX.filter(x=>x.id!==id);renderAll()}
-    toast('Transação removida.','trash');
+  conf_('Excluir transação',`Excluir "${t.desc}"?`,async()=>{
+    try{
+      await removeTransacao(id);
+      const row=document.getElementById('tr-'+id);
+      if(row){row.classList.add('removing');setTimeout(()=>{TX=TX.filter(x=>x.id!==id);renderAll()},300)}
+      else{TX=TX.filter(x=>x.id!==id);renderAll()}
+      toast('Transação removida.','trash');
+    }catch(e){
+      console.error('Erro ao remover transação:', e);
+      toast('Erro ao remover do banco de dados.','erro');
+    }
   });
 }
 
@@ -958,6 +1013,10 @@ const _now = new Date();
 calM = _now.getMonth();
 calY = _now.getFullYear();
 
-loadData();
-applySavedUIState();
-renderAll();
+async function init() {
+  loadData();
+  applySavedUIState();
+  await loadTransacoes();
+  renderAll();
+}
+init();
