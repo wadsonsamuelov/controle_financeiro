@@ -5,21 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinTrack — Gestão Financeira</title>
 
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<!-- Estilos -->
 <link rel="stylesheet" href="style.css">
 
-<!-- Dependências externas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="shell">
 
-<!-- ══════════ SIDEBAR ══════════ -->
 <aside id="sidebar">
   <div class="brand">
     <div class="brand-logo" onclick="goto('home')" title="Início">
@@ -108,7 +105,6 @@
   </div>
 </aside>
 
-<!-- ══════════ MAIN ══════════ -->
 <div id="main">
   <header id="topbar">
     <div class="tb-title-wrap">
@@ -129,15 +125,11 @@
 
   <div id="scroller">
 
-    <!-- ══ HOME ══ -->
     <div class="page active" id="pg-home">
 
-      <!-- ░░ HERO — WebGL wave + content ░░ -->
       <div class="home-hero">
-        <!-- WebGL canvas (sits behind content) -->
         <div id="wave-canvas-wrap"></div>
 
-        <!-- Content layer -->
         <div class="hero-content">
           <div class="hero-top-row">
             <div class="hero-left">
@@ -168,10 +160,8 @@
         </div>
       </div>
 
-      <!-- ░░ MIDDLE ROW — quick actions (left) + recent tx (right) ░░ -->
       <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:14px;align-items:start">
 
-        <!-- Quick actions -->
         <div>
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--tx-3);margin-bottom:10px">Ações rápidas</div>
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -206,7 +196,6 @@
           </div>
         </div>
 
-        <!-- Recent transactions preview -->
         <div class="card">
           <div class="card-hd">
             <div><div class="card-title">Últimas movimentações</div><div class="card-sub">Atividade recente</div></div>
@@ -222,7 +211,6 @@
         </div>
       </div>
 
-      <!-- ░░ BOTTOM ROW — nav cards ░░ -->
       <div>
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--tx-3);margin-bottom:10px">Navegar para</div>
         <div class="hnav-grid">
@@ -251,9 +239,7 @@
 
     </div>
 
-    <!-- ══ DASHBOARD ══ -->
     <div class="page" id="pg-dashboard">
-      <!-- Hero saldo -->
       <div class="dash-hero">
         <div class="dh-label">Saldo Total · Abril 2025</div>
         <div class="dh-bal" id="d-bal">—</div>
@@ -272,7 +258,6 @@
         </div>
       </div>
 
-      <!-- Secondary KPIs -->
       <div class="kpi-grid">
         <div class="kpi k-g">
           <div class="kpi-top">
@@ -303,7 +288,6 @@
         </div>
       </div>
 
-      <!-- Row: monthly + recent -->
       <div class="g2-3">
         <div class="card">
           <div class="card-hd">
@@ -324,7 +308,6 @@
                 <div class="mbar-track"><div class="mbar-fill mf-b" id="mb-net-b" style="width:0%"></div></div>
               </div>
             </div>
-            <!-- Comparison -->
             <div class="cmp-row">
               <span class="cmp-ico">📊</span>
               <span class="cmp-txt">vs mês anterior: ganhou mais</span>
@@ -353,7 +336,6 @@
       </div>
     </div>
 
-    <!-- ══ TRANSAÇÕES ══ -->
     <div class="page" id="pg-transacoes">
       <div class="strip" id="strip">
         <div class="strip-item">
@@ -397,7 +379,6 @@
       </div>
     </div>
 
-    <!-- ══ PROJETOS ══ -->
     <div class="page" id="pg-projetos">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
@@ -412,7 +393,6 @@
       <div class="goals-grid" id="goals-grid"></div>
     </div>
 
-    <!-- ══ CALENDÁRIO ══ -->
     <div class="page" id="pg-calendario">
       <div class="cal-nav">
         <div class="cal-nav-l">
@@ -452,7 +432,6 @@
       </div>
     </div>
 
-    <!-- ══ DISTRIBUIÇÃO ══ -->
     <div class="page" id="pg-distribuicao">
       <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;color:var(--tx-1)">Distribuição</div>
       <div class="g2">
@@ -473,7 +452,6 @@
       </div>
     </div>
 
-    <!-- ══ CÂMBIO ══ -->
     <div class="page" id="pg-cambio">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px">
         <div>
@@ -539,11 +517,10 @@
       </div>
     </div>
 
-  </div><!-- /scroller -->
-</div><!-- /main -->
-</div><!-- /shell -->
+  </div>
+</div>
+</div>
 
-<!-- ══ MODAL TX ══ -->
 <div class="overlay" id="ov-tx">
   <div class="modal">
     <div class="modal-hd"><span class="modal-title" id="tx-title">Nova Transação</span><button class="modal-close" onclick="closeTxModal()">×</button></div>
@@ -569,7 +546,6 @@
   </div>
 </div>
 
-<!-- ══ MODAL GOAL ══ -->
 <div class="overlay" id="ov-goal">
   <div class="modal modal-sm">
     <div class="modal-hd"><span class="modal-title" id="goal-title">Nova Meta</span><button class="modal-close" onclick="closeGoalModal()">×</button></div>
@@ -587,7 +563,6 @@
   </div>
 </div>
 
-<!-- ══ MODAL CAL ══ -->
 <div class="overlay" id="ov-cal">
   <div class="modal modal-sm">
     <div class="modal-hd"><span class="modal-title" id="cal-title">Novo Evento</span><button class="modal-close" onclick="closeCalModal()">×</button></div>
@@ -613,7 +588,6 @@
   </div>
 </div>
 
-<!-- ══ CONFIRM ══ -->
 <div class="conf-overlay" id="ov-conf">
   <div class="conf-box">
     <div class="conf-title" id="conf-title">Confirmar exclusão</div>
@@ -625,10 +599,8 @@
   </div>
 </div>
 
-<!-- ══ TOAST ══ -->
 <div id="toast"><svg id="t-ico" width="14" height="14" viewBox="0 0 14 14" fill="none"></svg><span id="t-msg"></span></div>
 
-<!-- ══ SETTINGS ══ -->
 <div class="set-overlay" id="ov-set">
   <div class="set-modal">
     <div class="set-top">
@@ -732,7 +704,5 @@
 
 
 </body>
-
-<!-- Lógica da aplicação -->
 <script src="script.js"></script>
 </html>
