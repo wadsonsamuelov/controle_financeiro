@@ -1,63 +1,52 @@
-# FinTrack — Gestão Financeira
+<div align="center">
 
-O FinTrack é um sistema de gestão financeira pessoal desenvolvido com foco em simplicidade, organização e visual moderno.
+# 💰 FinTrack — Gestão Financeira Pessoal
 
-O objetivo é permitir que usuários controlem suas finanças de forma prática, visual e eficiente, acompanhando receitas, despesas, metas e eventos financeiros.
+Sistema web para controle de finanças pessoais, com foco em simplicidade, organização visual e produtividade.
 
----
+[![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)]()
+[![Versão](https://img.shields.io/badge/versão-1.0.0-blue)]()
+[![Licença](https://img.shields.io/badge/licença-MIT-green)]()
 
-## Funcionalidades
-
-* Cadastro de receitas e despesas
-* Dashboard com indicadores e gráficos
-* Criação e acompanhamento de metas
-* Calendário financeiro
-* Análise por categoria e método
-* Tema claro/escuro
-* Persistência de dados com `localStorage`
+</div>
 
 ---
 
-## Tecnologias
+## 📌 Sobre o projeto
 
-* HTML5
-* CSS3
-* JavaScript
-* Chart.js
-* Git & GitHub
+O **FinTrack** ajuda usuários a acompanhar receitas, despesas, metas financeiras e eventos importantes em um único painel. A proposta é oferecer uma visão clara e imediata da saúde financeira do usuário, sem depender de planilhas ou anotações manuais.
 
----
+**Problema que resolve:** organizar o controle financeiro pessoal de forma visual, acessível e sem custo, centralizando lançamentos, metas e cotações de câmbio em um só lugar.
 
-## Como executar
-
-```bash
-git clone https://github.com/wadsonsamuelov/controle_financeiro.git
-cd controle_financeiro/src
-```
-
-Abra o `index.html` no navegador ou use o Live Server.
+**Público-alvo:** pessoas que querem acompanhar seus gastos e receitas de forma simples, sem depender de planilhas complexas ou apps pagos.
 
 ---
 
-## 📁 Estrutura
+## ✨ Funcionalidades
 
-```
-src/
-├── index.html
-├── style.css
-└── script.js
-```
-
----
-
-## Status
-
-Projeto em desenvolvimento.
-Versão 1.0
+- 📥 Cadastro de receitas e despesas
+- 📊 Dashboard com indicadores e gráficos (Chart.js)
+- 🎯 Criação e acompanhamento de metas financeiras
+- 📅 Calendário financeiro com eventos
+- 🗂️ Análise por categoria e método de pagamento
+- 💱 Cotações de câmbio em tempo real (USD, EUR, BTC) via AwesomeAPI
+- 🔄 Conversor de moedas integrado
+- 🌗 Tema claro/escuro
+- 💾 Persistência local de dados via `localStorage`
 
 ---
 
-## Autor
+## 🛠️ Tecnologias
 
-Wadson Samuel
-https://github.com/wadsonsamuelov
+| Tecnologia | Uso |
+|---|---|
+| HTML5 | Estrutura da aplicação |
+| CSS3 | Estilização e tema claro/escuro |
+| JavaScript | Lógica da aplicação |
+| Chart.js | Gráficos do dashboard |
+| AwesomeAPI | Cotações de câmbio em tempo real |
+| Git & GitHub | Versionamento e colaboração |
+
+---
+
+## 📁 Estrutura do projeto
