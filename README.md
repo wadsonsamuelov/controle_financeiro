@@ -51,4 +51,8 @@ O FinTrack é uma aplicação web para controle de finanças pessoais. O sistema
 
 <br>
 
+<div align="center">
+  <sub>Feito por <a href="https://github.com/wadsonsamuelov">Wadson Samuel</a></sub>
+  <sub>Colaborador <a href="https://github.com/rth-ur">Arthur Clemente</a></sub>
+</div>
 ## Estrutura do projeto
