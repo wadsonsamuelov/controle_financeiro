@@ -5,7 +5,7 @@
 
 <p>
   <img alt="status" src="https://img.shields.io/badge/status-em%20desenvolvimento-orange?style=flat-square">
-  <img alt="version" src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square">
+  <img alt="version" src="https://img.shields.io/badge/version-2.2.3-blue?style=flat-square">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square">
   <img alt="ci" src="https://img.shields.io/github/actions/workflow/status/wadsonsamuelov/controle_financeiro/ci.yml?label=CI%2FCD&style=flat-square">
   <img alt="html" src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white">
