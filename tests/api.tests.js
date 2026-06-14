@@ -1,8 +1,21 @@
-// tests/api.test.js
+// tests/api.tests.js
 // Teste de integração — AwesomeAPI (câmbio)
-// Como rodar: node tests/api.test.js
+// Como rodar: node tests/api.tests.js
 
 const API_URL = 'https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL';
+
+// Mock determinístico para CI/CD — evita dependência de rede externa
+const MOCK_DATA = {
+  USDBRL: { bid: '5.7500', ask: '5.7520', high: '5.8000', low: '5.7000', pctChange: '0.5' },
+  EURBRL: { bid: '6.2000', ask: '6.2050', high: '6.2500', low: '6.1500', pctChange: '-0.2' },
+  BTCBRL: { bid: '300000.00', ask: '300500.00', high: '305000.00', low: '298000.00', pctChange: '1.2' },
+};
+
+global.fetch = async () => ({
+  ok: true,
+  status: 200,
+  json: async () => ({ ...MOCK_DATA }),
+});
 
 let passou = 0;
 let falhou = 0;
