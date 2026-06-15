@@ -200,5 +200,5 @@ Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais informações
 ---
 
 <div align="center">
-  <sub>Feito por <a href="https://github.com/wadsonsamuelov">Wadson Samuel</a></sub>
+  <sub>Feito por <a href="https://github.com/wadsonsamuelov">Wadson Samuel e "https://github.com/rth-ur">Arthur Clemente</a></sub>
 </div>
