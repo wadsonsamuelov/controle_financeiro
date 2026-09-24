@@ -1,0 +1,9 @@
+# Envia somente os arquivos necessarios para construir a imagem.
+**
+!dockerfile
+!.dockerignore
+!nginx.conf
+!src/
+!src/**
+src/**/.*
+src/**/*.map
