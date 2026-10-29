@@ -19,7 +19,15 @@ jobs:
           node-version: '20'
 
       - name: Rodar testes
-        run: node tests/api.tests.js
+        run: npm test
+
+      - name: Salvar evidências dos cenários simulados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-testes-simulados
+          path: evidencias/
+          if-no-files-found: error
 
   deploy:
     name: Deploy no GitHub Pages

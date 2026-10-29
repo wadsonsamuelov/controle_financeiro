@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Plataforma web de gestão financeira pessoal",
   "scripts": {
-    "test": "node tests/api.tests.js"
+    "test": "node tests/api.tests.js && node tests/scenarios.tests.js",
+    "test:real": "node tests/api.real.tests.js"
   },
   "keywords": ["financeiro", "gestão", "câmbio"],
   "author": "Wadson Samuel",

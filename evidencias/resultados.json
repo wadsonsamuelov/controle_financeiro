@@ -1,0 +1,179 @@
+{
+  "executedAt": "2026-10-28T23:32:07.108Z",
+  "node": "v26.1.0",
+  "mode": "SIMULAÇÃO: funções reais de src/script.js com SDK Supabase, fetch e DOM substituídos.",
+  "limits": "Status do Supabase são fixtures do SDK, não respostas HTTP medidas. Não comprova validação ou persistência no banco, nem sanitização do provedor. Câmbio usa objetos Response simulados. O console ainda registra erros do banco.",
+  "passed": 7,
+  "failed": 0,
+  "results": [
+    {
+      "id": "CT-01",
+      "title": "Listagem",
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=*&order=data.desc",
+      "sent": null,
+      "simulatedStatus": 200,
+      "simulatedBody": [
+        {
+          "id": 123,
+          "desc": "Compra de teste",
+          "val": "50",
+          "tipo": "despesa",
+          "met": "pix",
+          "cat": "transporte",
+          "data": "2026-10-28"
+        }
+      ],
+      "checks": [
+        "Consulta correta ao SDK",
+        "Estado recebe todos os campos e valor numérico"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-02",
+      "title": "Criação",
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "desc": "Compra de teste",
+        "val": 50,
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "simulatedStatus": 201,
+      "simulatedBody": {
+        "id": 123,
+        "desc": "Compra de teste",
+        "val": "50",
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "checks": [
+        "Registro enviado ao SDK",
+        "Retorno com id e campos normalizados"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-03",
+      "title": "Campo obrigatório ausente",
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "val": 50,
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "simulatedStatus": 400,
+      "simulatedBody": {
+        "code": "23502",
+        "message": "Campo obrigatório desc ausente."
+      },
+      "checks": [
+        "Entrada encaminhada ao SDK",
+        "Operação rejeitada com código e mensagem do erro simulado"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-04",
+      "title": "Tipo numérico inválido",
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "desc": "Compra de teste",
+        "val": "abc",
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "simulatedStatus": 400,
+      "simulatedBody": {
+        "code": "22P02",
+        "message": "Valor inválido para numeric: abc."
+      },
+      "checks": [
+        "Entrada encaminhada ao SDK",
+        "Operação rejeitada com código e mensagem do erro simulado"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-05",
+      "title": "Câmbio",
+      "method": "GET",
+      "endpoint": "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL",
+      "sent": null,
+      "simulatedStatus": 200,
+      "simulatedBody": {
+        "USDBRL": {
+          "bid": "5",
+          "ask": "5.1",
+          "high": "5.2",
+          "low": "4.9",
+          "pctChange": "-0.2"
+        },
+        "EURBRL": {
+          "bid": "6",
+          "ask": "6.1",
+          "high": "6.2",
+          "low": "5.9",
+          "pctChange": "-0.2"
+        },
+        "BTCBRL": {
+          "bid": "7",
+          "ask": "7.1",
+          "high": "7.2",
+          "low": "6.9",
+          "pctChange": "-0.2"
+        }
+      },
+      "checks": [
+        "URL correta",
+        "Campos das três moedas convertidos",
+        "Interface renderizada e botão habilitado"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-06",
+      "title": "Erro interno nas transações",
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=*&order=data.desc",
+      "sent": null,
+      "simulatedStatus": 500,
+      "simulatedBody": {
+        "message": "Não foi possível concluir a solicitação. Tente novamente mais tarde."
+      },
+      "checks": [
+        "Aviso visual genérico",
+        "Estado anterior preservado"
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-07",
+      "title": "Erro HTTP no câmbio",
+      "method": "GET",
+      "endpoint": "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL",
+      "sent": null,
+      "simulatedStatus": 500,
+      "simulatedBody": {
+        "message": "Erro interno."
+      },
+      "checks": [
+        "Trata Response HTTP 500 simulado",
+        "Mensagem visual genérica e botão habilitado"
+      ],
+      "result": "APROVADO"
+    }
+  ]
+}

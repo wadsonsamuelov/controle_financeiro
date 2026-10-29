@@ -1,0 +1,153 @@
+{
+  "executedAt": "2026-10-28T23:42:30.293Z",
+  "mode": "REAL: requisições HTTP ao Supabase configurado no aplicativo.",
+  "projectUrl": "https://rjaynjwbutcjtyqyowso.supabase.co",
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    {
+      "id": "REAL-00",
+      "description": "Tabela acessível",
+      "expectedStatus": 200,
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=id&limit=0",
+      "sent": null,
+      "status": 200,
+      "body": [],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-02",
+      "description": "Criar registro fictício",
+      "expectedStatus": 201,
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "desc": "TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+        "val": 12.5,
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "status": 201,
+      "body": {
+        "id": 7,
+        "desc": "TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+        "val": 12.5,
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28",
+        "created_at": "2026-10-28T23:42:29.699522+00:00"
+      },
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-01",
+      "description": "Consultar registro persistido pelo ID",
+      "expectedStatus": 200,
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=*&order=data.desc&id=eq.7",
+      "sent": null,
+      "status": 200,
+      "body": [
+        {
+          "id": 7,
+          "desc": "TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+          "val": 12.5,
+          "tipo": "despesa",
+          "met": "pix",
+          "cat": "transporte",
+          "data": "2026-10-28",
+          "created_at": "2026-10-28T23:42:29.699522+00:00"
+        }
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-03",
+      "description": "Rejeitar campo obrigatório ausente",
+      "expectedStatus": 400,
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "val": 50,
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "status": 400,
+      "body": {
+        "code": "23502",
+        "details": null,
+        "hint": null,
+        "message": "null value in column \"desc\" of relation \"transacoes\" violates not-null constraint"
+      },
+      "result": "APROVADO"
+    },
+    {
+      "id": "CT-04",
+      "description": "Rejeitar valor numérico inválido",
+      "expectedStatus": 400,
+      "method": "POST",
+      "endpoint": "/rest/v1/transacoes?select=*",
+      "sent": {
+        "desc": "TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+        "val": "abc",
+        "tipo": "despesa",
+        "met": "pix",
+        "cat": "transporte",
+        "data": "2026-10-28"
+      },
+      "status": 400,
+      "body": {
+        "code": "22P02",
+        "details": null,
+        "hint": null,
+        "message": "invalid input syntax for type numeric: \"abc\""
+      },
+      "result": "APROVADO"
+    },
+    {
+      "id": "REAL-01",
+      "description": "Marcador exclusivo aparece somente no registro criado",
+      "expectedStatus": 200,
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=id&desc=eq.TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+      "sent": null,
+      "status": 200,
+      "body": [
+        {
+          "id": 7
+        }
+      ],
+      "result": "APROVADO"
+    },
+    {
+      "id": "LIMPEZA",
+      "description": "Remover somente o registro criado nesta execução",
+      "expectedStatus": 204,
+      "method": "DELETE",
+      "endpoint": "/rest/v1/transacoes?id=eq.7&desc=eq.TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c",
+      "sent": null,
+      "status": 204,
+      "body": null,
+      "result": "APROVADO"
+    },
+    {
+      "id": "LIMPEZA-02",
+      "description": "Confirmar remoção do registro de teste",
+      "expectedStatus": 200,
+      "method": "GET",
+      "endpoint": "/rest/v1/transacoes?select=id&id=eq.7",
+      "sent": null,
+      "status": 200,
+      "body": [],
+      "result": "APROVADO"
+    }
+  ],
+  "limits": "Erro 500 não é provocado no banco real; continua simulado na suíte npm test. CT-01 consulta por ID e não comprova ordenação de múltiplas transações. Se houver erro de rede durante a criação, um registro com o marcador pode permanecer no banco.",
+  "marker": "TESTE-AULA-07af882a-7a4e-4f94-9671-3edcb1ab7e6c"
+}

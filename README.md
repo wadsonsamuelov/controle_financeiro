@@ -125,12 +125,11 @@ Acesse em `http://localhost:8080`.
 
 ## Testes
 
-Os testes validam a integração com a API de câmbio (AwesomeAPI):
+Os testes verificam o comportamento do aplicativo com respostas simuladas das APIs, sem acessar os provedores reais:
 
 ```bash
 npm test
-# ou diretamente:
-node tests/api.tests.js
+# Gera também evidencias/resultados.md e evidencias/resultados.json
 ```
 
 ---
@@ -164,6 +163,26 @@ Para produção com sua própria instância:
 ---
 
 ## Schema do banco (Supabase)
+
+### Configurar o banco real para a demonstração
+
+O projeto atual já respondeu aos testes reais com sucesso. Para configurar uma nova instância de demonstração, execute primeiro [supabase/schema.sql](supabase/schema.sql) e depois [supabase/demo.sql](supabase/demo.sql) no SQL Editor. O primeiro cria a tabela e ativa RLS; o segundo permite as operações que o aplicativo sem login utiliza. Não é necessário reaplicar esses arquivos para repetir os testes no banco atual.
+
+**Somente dados fictícios:** as políticas de demonstração permitem que qualquer visitante consulte, cadastre, edite e exclua transações. Não utilize esse modo para finanças pessoais.
+
+Depois execute:
+
+```bash
+npm run test:real
+```
+
+Esse comando usa a conexão atual de `src/script.js`, verifica a tabela, cadastra um registro `TESTE-AULA-<identificador>`, consulta o registro salvo, testa erros 400 e tenta remover somente o registro criado nesta execução. Não limpa a tabela inteira. Em uma falha de rede durante a criação ou limpeza, confira se o registro com esse marcador permaneceu no banco.
+
+Os relatórios são gravados em `evidencias/resultados-reais.md` e `evidencias/resultados-reais.json`, separados dos testes simulados. O erro 500 continua sendo simulado por `npm test`: não provocamos falhas no banco real. Esta suíte real não roda automaticamente no pipeline.
+
+**Execução real comprovada:** oito verificações passaram, incluindo criação (201), consulta do registro persistido (200), ausência de campo obrigatório (400), tipo numérico inválido (400) e remoção do registro de teste (204), seguida de consulta confirmando sua ausência. Veja o [relatório real](evidencias/resultados-reais.md) e as [requisições e respostas recebidas](evidencias/resultados-reais.json). Somente registros fictícios com identificador exclusivo são usados; o teste não remove outras transações.
+
+Criar os arquivos SQL no repositório não cria a tabela no serviço: é necessário executá-los no SQL Editor. Um erro real `404 / PGRST205` indica que a API não encontrou a tabela; não equivale à aprovação dos cenários 200, 201 ou 400.
 
 A tabela `transacoes` no PostgreSQL:
 
@@ -324,15 +343,22 @@ O status deve ser exatamente 500: um bloqueio de rede ou timeout não substitui 
 npm test
 ```
 
-A suíte atual em [tests/api.tests.js](tests/api.tests.js) usa um `fetch` simulado que sempre retorna 200. Ela verifica parte do contrato de sucesso do câmbio, sem consultar os serviços reais. **CT-01 a CT-04 e CT-06 ainda precisam de execução manual ou automação futura; os testes atuais não comprovam esses cenários.**
+A suíte original em [tests/api.tests.js](tests/api.tests.js) verifica cinco condições de sucesso do câmbio com `fetch` simulado. A nova suíte [tests/scenarios.tests.js](tests/scenarios.tests.js) executa as funções reais de `src/script.js`, substituindo o SDK Supabase, o `fetch` e os elementos da página por simulações controladas. Não instala dependências e funciona no Node 20 ou superior.
 
-O [pipeline](.github/workflows/ci.yml) executa essa suíte nos pushes e pull requests para `main`; o deploy depende de sua aprovação. Os cenários deste README servem de especificação para a próxima etapa do pipeline solicitada pelo professor.
+Foram executados **sete cenários simulados, todos aprovados**, além das cinco verificações originais. CT-01 a CT-06 correspondem aos cenários acima; CT-07 acrescenta uma resposta HTTP 500 simulada no câmbio, verificando o aviso genérico e o botão de nova tentativa. Os arquivos de evidência são sobrescritos a cada execução e registram o resultado daquela execução, inclusive falhas.
 
-Para registrar uma execução, use uma linha por cenário:
+**Evidências para apresentar:**
 
-| Cenário | Data | Status recebido | Conteúdo e efeitos conferidos | Resultado | Evidência |
-|---|---|---|---|---|---|
-| CT-01 a CT-06 (registrar individualmente) | A preencher | A preencher | A preencher | Não executado | JSON/print sem tokens |
+- [Relatório legível com data, versão do Node e resultado por cenário](evidencias/resultados.md).
+- [Relatório JSON com entradas, status e corpos simulados e verificações](evidencias/resultados.json).
+- Para demonstrar ao vivo, abra o terminal na pasta do projeto e execute `npm test`. Mostre as linhas `PASSOU CT-01` até `PASSOU CT-07`, a contagem final e os relatórios gerados. Pode salvar uma captura dessa execução para a apresentação.
+- Após publicar e executar o [pipeline](.github/workflows/ci.yml), abra **GitHub → Actions → execução → Artifacts → evidencias-testes-simulados** para baixar os relatórios daquela execução. Uma execução local não comprova que o pipeline remoto passou.
+
+**O que está comprovado:** as funções do FinTrack enviam os parâmetros previstos, normalizam os dados de sucesso, propagam erros de criação e apresentam avisos genéricos de falha no carregamento. Nos cenários de Supabase, os status são metadados das fixtures do SDK; o aplicativo recebe os campos `data` e `error`. No câmbio, o aplicativo recebe objetos `Response` HTTP simulados.
+
+**Limite dos testes simulados:** eles não comprovam status HTTP e validação efetivos do Supabase, persistência, ordenação real dos registros ou sanitização de erros pelo provedor. A suíte separada `npm run test:real` agora comprova criação, consulta, erros 400 e limpeza no banco real, conforme o [relatório real](evidencias/resultados-reais.md). A ordenação de múltiplos registros e a sanitização de falhas reais do provedor continuam sem verificação. O corpo genérico do erro 500 é definido pela simulação. O console da aplicação ainda registra erros do banco; a mensagem visual verificada é genérica.
+
+O pipeline agora executa `npm test` e salva os relatórios como artefato. O deploy continua dependendo do sucesso dos testes. Para uma execução manual contra os provedores, registre separadamente data, status efetivamente recebido, corpo, efeitos no banco e resultado; não apresente o relatório simulado como teste de integração real.
 
 Depois dos testes, remova os registros criados na instância de testes usando os IDs anotados. Não inclua chaves nem tokens nas evidências.
 
