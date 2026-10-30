@@ -14,7 +14,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let dark=false, slim=false, activePage='home', activeFilter='todos';
 let editTxId=null, editGoalId=null, editCalId=null;
 let selType_='', selEvT_='', confCb=null, nextId=400;
-let calY=2025, calM=3;
+let calY=new Date().getFullYear(), calM=new Date().getMonth();
 
 const MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const GREETINGS=[
@@ -37,7 +37,6 @@ let CEVS=[
   {id:6,tipo:'extra',titulo:'13º salário',data:'2025-04-25',val:3250,obs:'Antecipação'},
 ];
 const STORAGE_KEYS = {
-  tx: 'fintrack_tx',
   goals: 'fintrack_goals',
   cevs: 'fintrack_cevs',
   dark: 'fintrack_dark',
@@ -184,7 +183,6 @@ function toggleDark(){
   saveData();
   setTimeout(rebuildMonthlyChart, 60);
 }
-function toggleDarkFromSet(){toggleDark()}
 
 /* ══ TOAST ══ */
 const TICK=`<path d="M2 7l3.5 3.5 6.5-7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -478,10 +476,6 @@ function openGoalModal(id){
     const g=GOALS.find(x=>x.id===id);if(!g)return;
     document.getElementById('goal-title').textContent='Editar Meta';
     document.getElementById('goal-submit').textContent='Salvar';
-    ['g-emoji','g-nome','g-alvo','g-atual'].forEach(k=>{
-      const map={g_emoji:'emoji',g_nome:'nome',g_alvo:'alvo',g_atual:'atual'};
-      document.getElementById(k).value=g[k.replace('g-','')];
-    });
     document.getElementById('g-emoji').value=g.emoji||'🎯';
     document.getElementById('g-nome').value=g.nome;
     document.getElementById('g-alvo').value=g.alvo;
@@ -545,7 +539,6 @@ function renderGoals(){
 
 /* ══ CALENDAR ══ */
 function renderCal(){
-  document.getElementById('cal-month').textContent=MN[calM]+(calM>3?' ':' ');
   document.getElementById('cal-month').textContent=new Date(calY,calM,1).toLocaleString('pt-BR',{month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   document.getElementById('cal-yr').textContent=calY;
   document.getElementById('cal-up-sub').textContent=MN[calM]+' '+calY;
@@ -615,7 +608,7 @@ function openCalModal(dateStr){
   document.querySelectorAll('.ev-topt').forEach(o=>o.classList.remove('sel'));
   ['ev-tit','ev-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ev-val').value='';
-  ['e-evt','e-evt'].forEach(id=>document.getElementById(id).textContent='');
+  document.getElementById('e-evt').textContent='';
   document.getElementById('ev-dat').value=dateStr||new Date().toISOString().slice(0,10);
   document.getElementById('cal-title').textContent='Novo Evento';
   document.getElementById('cal-submit').textContent='Salvar evento';
@@ -643,7 +636,7 @@ function selEvT(t,el){
 function submitCal(){
   const titulo=document.getElementById('ev-tit').value.trim();
   let ok=true;
-  ['e-evt'].forEach(id=>document.getElementById(id).textContent='');
+  document.getElementById('e-evt').textContent='';
   if(!selEvT_){document.getElementById('e-evt').textContent='Selecione o tipo.';ok=false}
   if(!titulo){document.getElementById('e-evt').textContent='Informe um título.';document.getElementById('ev-tit').classList.add('err');ok=false}
   else document.getElementById('ev-tit').classList.remove('err');
@@ -686,8 +679,7 @@ function renderDist(){
 
 /* ══ RENDER ALL ══ */
 function renderAll(){
-  renderHome();renderDash();renderStrip();renderTxList();renderHomeRecent();
-  document.getElementById('tx-ct').textContent=TX.length;
+  renderHome();renderDash();renderStrip();renderTxList();
   if(activePage==='projetos') renderGoals();
   if(activePage==='calendario') renderCal();
   if(activePage==='distribuicao') renderDist();
@@ -1009,10 +1001,6 @@ function swapConv() {
 }
 
 /* ══ INIT ══ */
-const _now = new Date();
-calM = _now.getMonth();
-calY = _now.getFullYear();
-
 async function init() {
   loadData();
   applySavedUIState();
